@@ -32,3 +32,6 @@ HEADERS += \
 
 FORMS += \
     finance.ui
+
+RESOURCES += \
+    cursors.qrc

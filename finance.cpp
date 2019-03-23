@@ -61,6 +61,10 @@ void finance::on_actionOpen_triggered()
                 break;
         }
 
+        QPixmap cursor_pixmap = QPixmap(":/images/cursor_left.png");
+        QCursor cursor_default = QCursor(cursor_pixmap, 0, 0);
+        setCursor(cursor_default);
+
         file.close();
     }
 }
