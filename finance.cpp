@@ -34,13 +34,31 @@ void finance::on_actionOpen_triggered()
         }
 
 
+        QString sign = "";
         while (!file.atEnd()) {
-            QByteArray line = file.readLine();
+            QString line = file.readLine();
+            line.remove("\"");
             QStringList wordList;
-            wordList.append(line.split(',').first());
+            wordList.append(line.split(','));
+            qDebug() << "Processing: " << line << endl;
+            if(wordList.length() < 5) {
+                qDebug() << "Ignoring line!\n";
+                continue;
+            }
             int row = ui->noneTable->rowCount();
             ui->noneTable->insertRow(row);
+
             ui->noneTable->setItem(row, 0, new QTableWidgetItem(wordList.at(0)));
+            ui->noneTable->setItem(row, 1, new QTableWidgetItem(wordList.at(1)));
+            if(wordList.at(4) == "credit")
+                sign = "-";
+            else
+                sign = "";
+            ui->noneTable->setItem(row, 2, new QTableWidgetItem(sign + wordList.at(3)));
+
+            // DEBUG
+            if(row > 30)
+                break;
         }
 
         file.close();
