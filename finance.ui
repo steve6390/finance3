@@ -18,7 +18,7 @@
     <item row="2" column="0">
      <layout class="QGridLayout" name="mainGrid">
       <item row="2" column="2">
-       <widget class="QTableWidget" name="jointTable">
+       <widget class="FinanceTableWidget" name="rightTable">
         <property name="rowCount">
          <number>0</number>
         </property>
@@ -32,7 +32,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QTableWidget" name="noneTable">
+       <widget class="FinanceTableWidget" name="midTable">
         <property name="rowCount">
          <number>0</number>
         </property>
@@ -53,7 +53,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QTableWidget" name="mineTable">
+       <widget class="FinanceTableWidget" name="leftTable">
         <property name="rowCount">
          <number>0</number>
         </property>
@@ -119,6 +119,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FinanceTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>financetablewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

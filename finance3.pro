@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     finance.cpp \
-    helpers.cpp
+    helpers.cpp \
+    financetablewidget.cpp
 
 HEADERS += \
     finance.h \
-    helpers.h
+    helpers.h \
+    financetablewidget.h
 
 FORMS += \
     finance.ui

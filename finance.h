@@ -23,9 +23,10 @@ public:
 
 private slots:
     void on_actionOpen_triggered();
-    void keyPressEvent(QKeyEvent* event);
-    void keyReleaseEvent(QKeyEvent* event);
-    void noneTableClickEvent(int row, int column);
+    void leftTableMoveRight(int row);
+    void midTableMoveLeft(int row);
+    void midTableMoveRight(int row);
+    void rightTableMoveLeft(int row);
 
 private:
     Ui::finance *ui;
@@ -33,14 +34,11 @@ private:
     QCursor leftCursor = QCursor(leftCursorPixmap, 0, 21);
     QPixmap rightCursorPixmap = QPixmap(":/images/cursor_right.png");
     QCursor rightCursor = QCursor(rightCursorPixmap, 53, 21);
+    QPixmap bothCursorPixmap = QPixmap(":/images/cursor_both.png");
+    QCursor bothCursor = QCursor(bothCursorPixmap, 3, 14);
 
-    enum cursorOverrideType {
-        none,
-        left,
-        right
-    };
+    void moveRow(QTableWidget* fromTable, QTableWidget* toTable, int row);
 
-    QVector<cursorOverrideType> override_stack;
 };
 
 #endif // MAINWINDOW_H

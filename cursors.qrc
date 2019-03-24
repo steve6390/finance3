@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>images/cursor_left.png</file>
         <file>images/cursor_right.png</file>
+        <file>images/cursor_both.png</file>
     </qresource>
 </RCC>
