@@ -1,6 +1,6 @@
 #include "helpers.h"
 
-// takes and returns the whole row
+// Returns a whole row and removes that row from the table.
 QList<QTableWidgetItem*> takeRow(QTableWidget* tbl, int row)
 {
     QList<QTableWidgetItem*> rowItems;
@@ -10,7 +10,7 @@ QList<QTableWidgetItem*> takeRow(QTableWidget* tbl, int row)
     return rowItems;
 }
 
-// sets the whole row
+// Adds a row from a list of widget items.
 void addRow(QTableWidget* tbl, const QList<QTableWidgetItem*>& rowItems)
 {
     if( rowItems.empty())

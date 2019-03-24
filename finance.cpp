@@ -20,8 +20,23 @@ finance::finance(QWidget *parent) :
 
 void finance::noneTableClickEvent(int row, int column) {
     qDebug() << "Clicked on noneTable (row,col) = " << row << "," << column << endl;
-    QList<QTableWidgetItem*> rowList = takeRow(ui->noneTable, row);
-    addRow(ui->jointTable, rowList);
+    if(override_stack.empty())
+        return;
+
+    QList<QTableWidgetItem*> rowList;
+
+    switch(override_stack.back()) {
+    case right:
+        rowList = takeRow(ui->noneTable, row);
+        addRow(ui->jointTable, rowList);
+        break;
+    case left:
+        rowList = takeRow(ui->noneTable, row);
+        addRow(ui->mineTable, rowList);
+        break;
+    default:
+        break;
+    }
 }
 
 

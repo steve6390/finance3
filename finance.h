@@ -30,9 +30,9 @@ private slots:
 private:
     Ui::finance *ui;
     QPixmap leftCursorPixmap = QPixmap(":/images/cursor_left.png");
-    QCursor leftCursor = QCursor(leftCursorPixmap, 0, 0);
+    QCursor leftCursor = QCursor(leftCursorPixmap, 0, 21);
     QPixmap rightCursorPixmap = QPixmap(":/images/cursor_right.png");
-    QCursor rightCursor = QCursor(rightCursorPixmap, 0, 0);
+    QCursor rightCursor = QCursor(rightCursorPixmap, 53, 21);
 
     enum cursorOverrideType {
         none,
