@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QTextStream>
 #include <QTableWidget>
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QCursor>
+#include <QVector>
 
 namespace Ui {
 class finance;
@@ -19,10 +23,24 @@ public:
 
 private slots:
     void on_actionOpen_triggered();
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
+    void noneTableClickEvent(int row, int column);
 
 private:
     Ui::finance *ui;
+    QPixmap leftCursorPixmap = QPixmap(":/images/cursor_left.png");
+    QCursor leftCursor = QCursor(leftCursorPixmap, 0, 0);
+    QPixmap rightCursorPixmap = QPixmap(":/images/cursor_right.png");
+    QCursor rightCursor = QCursor(rightCursorPixmap, 0, 0);
 
+    enum cursorOverrideType {
+        none,
+        left,
+        right
+    };
+
+    QVector<cursorOverrideType> override_stack;
 };
 
 #endif // MAINWINDOW_H

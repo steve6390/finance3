@@ -4,13 +4,23 @@
 #include <QMessageBox>
 #include <QStringList>
 #include <QtDebug>
+#include <QApplication>
 
 finance::finance(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::finance)
 {
     ui->setupUi(this);
+
+    connect(ui->noneTable, &QTableWidget::cellClicked,
+            this, &finance::noneTableClickEvent);
+
 }
+
+void finance::noneTableClickEvent(int row, int column) {
+    qDebug() << "Clicked on (row,col) = " << row << "," << column << endl;
+}
+
 
 finance::~finance()
 {
@@ -61,10 +71,41 @@ void finance::on_actionOpen_triggered()
                 break;
         }
 
-        QPixmap cursor_pixmap = QPixmap(":/images/cursor_left.png");
-        QCursor cursor_default = QCursor(cursor_pixmap, 0, 0);
-        setCursor(cursor_default);
-
         file.close();
+    }
+}
+
+void finance::keyPressEvent(QKeyEvent* event) {
+    if(override_stack.empty()) {
+        switch(event->key()) {
+        case Qt::Key_Control:
+            qDebug() << "Ctrl press! " << endl;
+            QApplication::setOverrideCursor(leftCursor);
+            override_stack.push_back(left);
+            break;
+        case Qt::Key_Shift:
+            qDebug() << "Shift press!";
+            QApplication::setOverrideCursor(rightCursor);
+            override_stack.push_back(right);
+            break;
+        default:
+            qDebug() << "Unknown keypress!";
+            event->ignore();
+            break;
+        }
+    }
+    qDebug() << endl;
+}
+
+void finance::keyReleaseEvent(QKeyEvent* event) {
+    (void)event;
+    qDebug() << "Release!";
+
+
+    if(override_stack.empty()) {
+        event->ignore();
+    } else {
+        QApplication::restoreOverrideCursor();
+        override_stack.pop_back();
     }
 }
