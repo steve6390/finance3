@@ -1,4 +1,5 @@
 #include "finance.h"
+#include "helpers.h"
 #include "ui_finance.h"
 #include <QFileDialog>
 #include <QMessageBox>
@@ -18,7 +19,9 @@ finance::finance(QWidget *parent) :
 }
 
 void finance::noneTableClickEvent(int row, int column) {
-    qDebug() << "Clicked on (row,col) = " << row << "," << column << endl;
+    qDebug() << "Clicked on noneTable (row,col) = " << row << "," << column << endl;
+    QList<QTableWidgetItem*> rowList = takeRow(ui->noneTable, row);
+    addRow(ui->jointTable, rowList);
 }
 
 
