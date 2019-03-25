@@ -8,6 +8,7 @@
 #include <QPixmap>
 #include <QCursor>
 #include <QVector>
+#include <QStringList>
 
 namespace Ui {
 class finance;
@@ -39,6 +40,7 @@ private:
 
     void moveRow(QTableWidget* fromTable, QTableWidget* toTable, int row);
 
+    QStringList ignoreColumns;
 };
 
 #endif // MAINWINDOW_H

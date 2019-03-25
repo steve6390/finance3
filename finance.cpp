@@ -21,6 +21,13 @@ finance::finance(QWidget *parent) :
             this, &finance::midTableMoveRight);
     connect(ui->rightTable, &FinanceTableWidget::moveLeft,
             this, &finance::rightTableMoveLeft);
+
+    // Column names to ignore
+    // Todo: get these from a user config file
+    ignoreColumns.append("Category");
+    ignoreColumns.append("Labels");
+    ignoreColumns.append("Account Name");
+    ignoreColumns.append("Original Description");
 }
 
 void finance::moveRow(QTableWidget* fromTable, QTableWidget* toTable, int row) {
@@ -35,6 +42,14 @@ finance::~finance() {
 }
 
 
+// clean up unwanted characters from each entry in the QStringList
+void sanitize(QStringList& list){
+  QMutableStringListIterator i(list);
+  while(i.hasNext()){
+    i.next().remove('\"');
+  }
+}
+
 void finance::on_actionOpen_triggered()
 {
     qDebug() << "I'm in the action!";
@@ -43,42 +58,73 @@ void finance::on_actionOpen_triggered()
 
     qDebug() << "Selected file name is " << fileName << endl;
 
-    if (!fileName.isEmpty()) {
-        QFile file(fileName);
-        if (!file.open(QIODevice::ReadOnly)) {
-            QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
-            return;
-        }
+    if(fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+        return;
+    }
 
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+        return;
+    }
 
-        QString sign = "";
-        while (!file.atEnd()) {
-            QString line = file.readLine();
-            line.remove("\"");
-            QStringList wordList;
-            wordList.append(line.split(','));
-            qDebug() << "Processing: " << line << endl;
-            if(wordList.length() < 5) {
-                qDebug() << "Ignoring line!\n";
-                continue;
-            }
-            int row = ui->midTable->rowCount();
-            ui->midTable->insertRow(row);
-
-            ui->midTable->setItem(row, 0, new QTableWidgetItem(wordList.at(0)));
-            ui->midTable->setItem(row, 1, new QTableWidgetItem(wordList.at(1)));
-            if(wordList.at(4) == "credit")
-                sign = "-";
-            else
-                sign = "";
-            ui->midTable->setItem(row, 2, new QTableWidgetItem(sign + wordList.at(3)));
-
-            // DEBUG
-            if(row > 30)
-                break;
-        }
-
+    if(file.atEnd()) {
+        QMessageBox::critical(this, tr("Error"), tr("File is empty!"));
         file.close();
+        return;
+    }
+
+
+    // read all lines of the file in a QStringList
+    QStringList lines;
+    while(!file.atEnd())
+        lines.append(file.readLine());
+    file.close();
+
+    // Get the list of comma separated header row titles
+    QStringList headerList;
+    headerList.append(lines.at(0).split(','));
+    sanitize(headerList);
+
+    // make sure our table has enough columns
+    int numCols = ui->midTable->columnCount();
+    for(int end = headerList.length(); numCols < end; numCols++) {
+        ui->leftTable->insertColumn(numCols);
+        ui->midTable->insertColumn(numCols);
+        ui->rightTable->insertColumn(numCols);
+    }
+
+    ui->leftTable->setHorizontalHeaderLabels(headerList);
+    ui->midTable->setHorizontalHeaderLabels(headerList);
+    ui->rightTable->setHorizontalHeaderLabels(headerList);
+
+    for(const auto& line : lines) {
+        qDebug() << "Processing: " << line << endl;
+        QStringList wordList;
+        wordList.append(line.split(','));
+        sanitize(wordList);
+
+        int row = ui->midTable->rowCount();
+        ui->midTable->insertRow(row);
+
+        for(int col = 0, numCols = wordList.length(); col < numCols; col++)
+            ui->midTable->setItem(row, col, new QTableWidgetItem(wordList.at(col)));
+
+        // DEBUG
+        if(row > 30)
+            break;
+    }
+
+    // hide ignored columns in all tables
+    QMutableStringListIterator i(ignoreColumns);
+    while(i.hasNext()){
+        int col = headerList.indexOf(i.next());
+        if(col == -1)
+            continue;
+        ui->leftTable->hideColumn(col);
+        ui->midTable->hideColumn(col);
+        ui->rightTable->hideColumn(col);
     }
 }
 

@@ -6,6 +6,11 @@
 
 QT       += core gui
 
+# where is C++17 support???
+#QMAKE_CXXFLAGS = -std=c++17
+#CONFIG = c++1z
+
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = finance3
