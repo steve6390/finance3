@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QStringList>
 #include <QtDebug>
+#include <QSettings>
+
 
 finance::finance(QWidget *parent) :
     QMainWindow(parent),
@@ -22,12 +24,78 @@ finance::finance(QWidget *parent) :
     connect(ui->rightTable, &FinanceTableWidget::moveLeft,
             this, &finance::rightTableMoveLeft);
 
-    // Column names to ignore
-    // Todo: get these from a user config file
-    ignoreColumns.append("Category");
-    ignoreColumns.append("Labels");
-    ignoreColumns.append("Account Name");
-    ignoreColumns.append("Original Description");
+    // Restore settings
+    readSettings();
+}
+
+void finance::closeEvent(QCloseEvent* event){
+    // Save our current configuration
+    qDebug() << "Closing up!" << endl;
+    writeSettings();
+    QMainWindow::closeEvent(event);
+}
+
+void finance::writeSettings() {
+    QSettings settings("Personal", "Finance");
+
+    settings.beginGroup("MainWindow");
+    settings.setValue("size", size());
+    settings.setValue("pos", pos());
+    settings.endGroup();
+
+    settings.beginWriteArray("IgnoreColumns");
+    for(int i = 0, end = ignoreColumns.count(); i < end; i++) {
+        settings.setArrayIndex(i);
+        settings.setValue("name",ignoreColumns.at(i));
+    }
+    settings.endArray();
+
+    settings.beginWriteArray("Right");
+    for(int i = 0, end = jointList.count(); i < end; i++) {
+        settings.setArrayIndex(i);
+        settings.setValue("Description",jointList.at(i));
+    }
+    settings.endArray();
+
+    settings.beginWriteArray("Left");
+    for(int i = 0, end = mineList.count(); i < end; i++) {
+        settings.setArrayIndex(i);
+        settings.setValue("Description",mineList.at(i));
+    }
+    settings.endArray();
+
+}
+
+void finance::readSettings()
+{
+    QSettings settings("Personal", "Finance");
+
+    settings.beginGroup("MainWindow");
+    resize(settings.value("size", QSize(1024, 768)).toSize());
+    move(settings.value("pos", QPoint(200, 200)).toPoint());
+    settings.endGroup();
+
+    int end = settings.beginReadArray("IgnoreColumns");
+    for(int i = 0; i < end; i++) {
+        settings.setArrayIndex(i);
+        ignoreColumns.append(settings.value("Description").toString());
+    }
+    settings.endArray();
+
+    end = settings.beginReadArray("Right");
+    for(int i = 0; i < end; i++) {
+        settings.setArrayIndex(i);
+        jointList.append(settings.value("Description").toString());
+    }
+    settings.endArray();
+
+    end = settings.beginReadArray("Left");
+    for(int i = 0; i < end; i++) {
+        settings.setArrayIndex(i);
+        mineList.append(settings.value("Description").toString());
+    }
+    settings.endArray();
+
 }
 
 void finance::moveRow(QTableWidget* fromTable, QTableWidget* toTable, int row) {
@@ -46,7 +114,9 @@ finance::~finance() {
 void sanitize(QStringList& list){
   QMutableStringListIterator i(list);
   while(i.hasNext()){
-    i.next().remove('\"');
+    QString& s = i.next();
+    s.remove('\"');
+    s.remove('\n');
   }
 }
 
@@ -87,6 +157,12 @@ void finance::on_actionOpen_triggered()
     headerList.append(lines.at(0).split(','));
     sanitize(headerList);
 
+    descriptionColumn = headerList.indexOf("Description");
+    if(descriptionColumn == -1) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Description' column!"));
+        return;
+    }
+
     // make sure our table has enough columns
     int numCols = ui->midTable->columnCount();
     for(int end = headerList.length(); numCols < end; numCols++) {
@@ -112,7 +188,7 @@ void finance::on_actionOpen_triggered()
             ui->midTable->setItem(row, col, new QTableWidgetItem(wordList.at(col)));
 
         // DEBUG
-        if(row > 30)
+        if(row > 50)
             break;
     }
 
@@ -125,6 +201,26 @@ void finance::on_actionOpen_triggered()
         ui->leftTable->hideColumn(col);
         ui->midTable->hideColumn(col);
         ui->rightTable->hideColumn(col);
+    }
+
+    movePredeterminedRows(ui->midTable, ui->rightTable, jointList);
+    movePredeterminedRows(ui->midTable, ui->leftTable, mineList);
+}
+
+void finance::movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTable,
+                                    const QStringList& list) {
+    QStringListIterator i(list);
+    while(i.hasNext()) {
+        const QString s = i.next();
+        qDebug() << "Checking for pre-determined item: " << s << endl;
+        for(int row = 1, end = fromTable->rowCount(); row < end; row++) {
+            if(fromTable->item(row, descriptionColumn)->text() == s) {
+                qDebug() << "Found on row: " << row << endl;
+                moveRow(fromTable, toTable, row);
+                // we just reduced the max row count by 1
+                end--;
+            }
+        }
     }
 }
 

@@ -21,6 +21,7 @@ class finance : public QMainWindow
 public:
     explicit finance(QWidget *parent = 0);
     ~finance();
+    void closeEvent(QCloseEvent* event);
 
 private slots:
     void on_actionOpen_triggered();
@@ -39,8 +40,21 @@ private:
     QCursor bothCursor = QCursor(bothCursorPixmap, 3, 14);
 
     void moveRow(QTableWidget* fromTable, QTableWidget* toTable, int row);
+    void movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTable,
+                               const QStringList& list);
+
+    void movePredeterminedRows();
+
+    void writeSettings();
+    void readSettings();
 
     QStringList ignoreColumns;
+    QStringList jointList;
+    QStringList mineList;
+
+    // Holds the column number of the "Description" column
+    int descriptionColumn;
+
 };
 
 #endif // MAINWINDOW_H
