@@ -7,7 +7,7 @@
 #include <QStringList>
 #include <QtDebug>
 #include <QSettings>
-
+#include <math.h>
 
 finance::finance(QWidget *parent) :
     QMainWindow(parent),
@@ -157,9 +157,20 @@ void finance::on_actionOpen_triggered()
     headerList.append(lines.at(0).split(','));
     sanitize(headerList);
 
+    // We've finished processing the header row, so remove
+    // it from lines to prevent the header from becoming
+    // a table entry.
+    lines.removeFirst();
+
     descriptionColumn = headerList.indexOf("Description");
     if(descriptionColumn == -1) {
         QMessageBox::critical(this, tr("Error"), tr("Could not find 'Description' column!"));
+        return;
+    }
+
+    amountColumn = headerList.indexOf("Amount");
+    if(amountColumn == -1) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Amount' column!"));
         return;
     }
 
@@ -205,6 +216,31 @@ void finance::on_actionOpen_triggered()
 
     movePredeterminedRows(ui->midTable, ui->rightTable, jointList);
     movePredeterminedRows(ui->midTable, ui->leftTable, mineList);
+    calculateTotals();
+}
+
+void finance::calcTotal(const QTableWidget& tbl, QLabel* totalLabel) {
+    double total = 0;
+    for(int row = 0, end = tbl.rowCount(); row < end; row++) {
+        QString amtString = tbl.item(row, amountColumn)->text();
+        double amtVal = amtString.toDouble();
+        total += amtVal;
+    }
+
+    // Storing dollars and cents in a double
+    // has surprising complexities.  In our case
+    // we have enough precision with a double,
+    // so just print with 2 decimals of precision
+    // for the cents.
+
+    QString txt = "Total $" + QString::number(total, 'f', 2);
+    totalLabel->setText(txt);
+}
+
+void finance::calculateTotals() {
+    calcTotal(*ui->leftTable, ui->leftTotal);
+    calcTotal(*ui->midTable, ui->midTotal);
+    calcTotal(*ui->rightTable, ui->rightTotal);
 }
 
 void finance::movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTable,
@@ -226,13 +262,20 @@ void finance::movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTab
 
 void finance::leftTableMoveRight(int row) {
     moveRow(ui->leftTable, ui->midTable, row);
+    calculateTotals();
 }
+
 void finance::midTableMoveLeft(int row) {
     moveRow(ui->midTable, ui->leftTable, row);
+    calculateTotals();
 }
+
 void finance::midTableMoveRight(int row) {
     moveRow(ui->midTable, ui->rightTable, row);
+    calculateTotals();
 }
+
 void finance::rightTableMoveLeft(int row) {
     moveRow(ui->rightTable, ui->midTable, row);
+    calculateTotals();
 }

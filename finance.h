@@ -9,6 +9,7 @@
 #include <QCursor>
 #include <QVector>
 #include <QStringList>
+#include <QLabel>
 
 namespace Ui {
 class finance;
@@ -43,6 +44,9 @@ private:
     void movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTable,
                                const QStringList& list);
 
+
+    void calcTotal(const QTableWidget& tbl, QLabel* total);
+    void calculateTotals();
     void movePredeterminedRows();
 
     void writeSettings();
@@ -53,7 +57,8 @@ private:
     QStringList mineList;
 
     // Holds the column number of the "Description" column
-    int descriptionColumn;
+    int descriptionColumn = -1;
+    int amountColumn = -1;
 
 };
 
