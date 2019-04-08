@@ -3,9 +3,12 @@
 
 #include <QStringList>
 #include <QVector>
+#include <QVectorIterator>
 #include <QTableWidget>
+#include <QRegExp>
 
 using StringListVec = QVector<QStringList>;
+using StringListVecItor = QVectorIterator<QStringList>;
 
 /**
  * @brief takeRow Removes the specified row from a table widget.
@@ -52,5 +55,16 @@ void sanitize(QStringList* list);
  * @param minLength
  */
 void normalizeRowsVec(StringListVec* rv, int minLength);
+
+/**
+ * @brief getDateFromString Given a string mm/dd/yyyy format, return
+ * integers from month, day, year.  Month a day may be single digits.
+ * Year must be 4 digits.
+ * @param str
+ * @param day
+ * @param month
+ * @param year
+ */
+void getDateFromString(const QString& str, int* day, int* month, int* year);
 
 #endif // HELPERS_H

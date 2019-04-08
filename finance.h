@@ -10,6 +10,7 @@
 #include <QVector>
 #include <QStringList>
 #include <QLabel>
+#include <QDate>
 #include "helpers.h"
 
 namespace Ui {
@@ -52,6 +53,11 @@ private:
     void calculateTotals();
     void movePredeterminedRows();
 
+    void resetTables();
+
+    void initMonthVec();
+
+
     void writeSettings();
     void readSettings();
 
@@ -66,9 +72,15 @@ private:
     // Track the minimum column number we require
     int minRequiredCol = -1;
 
-    // Vector of lists setup in on_actionOpen_triggered.
+    // Vector of lists for the entire csv file.
+    // Setup in on_actionOpen_triggered.
     // Each entry in the vector is a list of values for that row.
-    StringListVec rowsVec;
+    StringListVec fileRowsVec;
+
+    // Vector of lists for the current month.
+    // Setup in on_actionOpen_triggered.
+    // Each entry in the vector is a list of values for that row.
+    StringListVec monthRowsVec;
 };
 
 #endif // MAINWINDOW_H

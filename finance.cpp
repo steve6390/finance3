@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QtDebug>
 #include <QSettings>
+#include <QVector>
 #include <math.h>
 
 finance::finance(QWidget *parent) :
@@ -31,6 +32,7 @@ finance::finance(QWidget *parent) :
 
 void finance::dateUpdate(const QDate &date) {
     qDebug() << "Date update! " << date << endl;
+    resetTables();
 }
 
 void finance::closeEvent(QCloseEvent* event){
@@ -194,13 +196,10 @@ void finance::on_actionOpen_triggered()
     ui->rightTable->setHorizontalHeaderLabels(headerList);
 
     // Convert raw csv lines into vector of string lists
-    buildRowsVec(lines, &rowsVec);
+    buildRowsVec(lines, &fileRowsVec);
 
     // Remove runt or oversize rows from the rows vector
-    normalizeRowsVec(&rowsVec, minRequiredCol);
-
-    // Populate the middle table with our vector of string lists
-    setRows(ui->midTable, rowsVec);
+    normalizeRowsVec(&fileRowsVec, minRequiredCol);
 
     // hide ignored columns in all tables
     QMutableStringListIterator i(ignoreColumns);
@@ -212,6 +211,42 @@ void finance::on_actionOpen_triggered()
         ui->midTable->hideColumn(col);
         ui->rightTable->hideColumn(col);
     }
+
+    // Setup tables for the selected date range.
+    // Currently, the range is all days in the specified month.
+    resetTables();
+}
+
+void finance::initMonthVec() {
+    // clear existing entrys from the month vec
+    monthRowsVec.clear();
+    StringListVecItor i(fileRowsVec);
+    const QDate& date = ui->dateEdit->date();
+    while(i.hasNext()) {
+        const QStringList& qsl = i.next();
+        // Date format string is "mm/dd/yyyy" where month and day
+        // can be single digits.
+
+        int day = 0;
+        int month = 0;
+        int year = 0;
+
+        QString strDate = qsl.at(dateColumn);
+        getDateFromString(strDate, &day, &month, &year);
+        // if the date is the right month and year, then copy
+        // the StringList to the month vector.
+        if(year == date.year() and month == date.month())
+            monthRowsVec.append(qsl);
+    }
+}
+
+void finance::resetTables() {
+
+    // Create the StringListVec for the specified month
+    initMonthVec();
+
+    // Populate the middle table with our vector of string lists
+    setRows(ui->midTable, monthRowsVec);
 
     movePredeterminedRows(ui->midTable, ui->rightTable, jointList);
     movePredeterminedRows(ui->midTable, ui->leftTable, mineList);
@@ -262,8 +297,10 @@ void finance::movePredeterminedRows(QTableWidget* fromTable,
                     } else {
                         qDebug() << "    null!";
                     }
-
                 }
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("table has null description!"));
+                return;
             }
             if(wi->text() == s) {
                 qDebug() << "    Found on row: " << row;

@@ -1,5 +1,6 @@
 #include "helpers.h"
 #include <QDebug>
+#include <QRegExp>
 
 // Returns a whole row and removes that row from the table.
 QList<QTableWidgetItem*> takeRow(QTableWidget* tbl, int row)
@@ -56,4 +57,22 @@ void sanitize(QStringList* list) {
   }
 }
 
+void getDateFromString(const QString& str, int* day, int* month, int* year) {
+    static const QRegExp rx("(\\d+)/(\\d+)/(\\d\\d\\d\\d)");
+    int pos = rx.indexIn(str);
+    if(pos == -1) {
+        qDebug() << "Error, coudn't extract date from: " << str;
+        exit(-1);
+    }
+    // The first captured string is the entire substring
 
+    QStringList ql = rx.capturedTexts();
+    if(ql.length() != 4) {
+        qDebug() << "Error, bad date extract date from: " << str;
+        exit(-1);
+    }
+
+    *month = ql.at(1).toInt();
+    *day = ql.at(2).toInt();
+    *year = ql.at(3).toInt();
+}
