@@ -10,6 +10,7 @@
 #include <QVector>
 #include <QStringList>
 #include <QLabel>
+#include "helpers.h"
 
 namespace Ui {
 class finance;
@@ -30,6 +31,7 @@ private slots:
     void midTableMoveLeft(int row);
     void midTableMoveRight(int row);
     void rightTableMoveLeft(int row);
+    void dateUpdate(const QDate& date);
 
 private:
     Ui::finance *ui;
@@ -44,6 +46,7 @@ private:
     void movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTable,
                                const QStringList& list);
 
+    void setRows(QTableWidget* tbl, const StringListVec& lv);
 
     void calcTotal(const QTableWidget& tbl, QLabel* total);
     void calculateTotals();
@@ -56,10 +59,16 @@ private:
     QStringList jointList;
     QStringList mineList;
 
-    // Holds the column number of the "Description" column
+    // Interesting column numbers set in on_actionOpen_triggered
     int descriptionColumn = -1;
     int amountColumn = -1;
+    int dateColumn = -1;
+    // Track the minimum column number we require
+    int minRequiredCol = -1;
 
+    // Vector of lists setup in on_actionOpen_triggered.
+    // Each entry in the vector is a list of values for that row.
+    StringListVec rowsVec;
 };
 
 #endif // MAINWINDOW_H

@@ -1,5 +1,4 @@
 #include "finance.h"
-#include "helpers.h"
 #include "ui_finance.h"
 #include "financetablewidget.h"
 #include <QFileDialog>
@@ -23,9 +22,15 @@ finance::finance(QWidget *parent) :
             this, &finance::midTableMoveRight);
     connect(ui->rightTable, &FinanceTableWidget::moveLeft,
             this, &finance::rightTableMoveLeft);
+    connect(ui->dateEdit, &QDateEdit::dateChanged,
+            this, &finance::dateUpdate);
 
     // Restore settings
     readSettings();
+}
+
+void finance::dateUpdate(const QDate &date) {
+    qDebug() << "Date update! " << date << endl;
 }
 
 void finance::closeEvent(QCloseEvent* event){
@@ -110,15 +115,6 @@ finance::~finance() {
 }
 
 
-// clean up unwanted characters from each entry in the QStringList
-void sanitize(QStringList& list){
-  QMutableStringListIterator i(list);
-  while(i.hasNext()){
-    QString& s = i.next();
-    s.remove('\"');
-    s.remove('\n');
-  }
-}
 
 void finance::on_actionOpen_triggered()
 {
@@ -155,24 +151,35 @@ void finance::on_actionOpen_triggered()
     // Get the list of comma separated header row titles
     QStringList headerList;
     headerList.append(lines.at(0).split(','));
-    sanitize(headerList);
+    sanitize(&headerList);
 
     // We've finished processing the header row, so remove
     // it from lines to prevent the header from becoming
     // a table entry.
     lines.removeFirst();
 
+    // As we get column info, also calculate the largest required column.
+    // We don't care about per row length variations larger than this column.
     descriptionColumn = headerList.indexOf("Description");
     if(descriptionColumn == -1) {
         QMessageBox::critical(this, tr("Error"), tr("Could not find 'Description' column!"));
         return;
     }
+    minRequiredCol = std::max(minRequiredCol, descriptionColumn);
 
     amountColumn = headerList.indexOf("Amount");
     if(amountColumn == -1) {
         QMessageBox::critical(this, tr("Error"), tr("Could not find 'Amount' column!"));
         return;
     }
+    minRequiredCol = std::max(minRequiredCol, amountColumn);
+
+    dateColumn = headerList.indexOf("Date");
+    if(amountColumn == -1) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Date' column!"));
+        return;
+    }
+    minRequiredCol = std::max(minRequiredCol, dateColumn);
 
     // make sure our table has enough columns
     int numCols = ui->midTable->columnCount();
@@ -186,22 +193,14 @@ void finance::on_actionOpen_triggered()
     ui->midTable->setHorizontalHeaderLabels(headerList);
     ui->rightTable->setHorizontalHeaderLabels(headerList);
 
-    for(const auto& line : lines) {
-        qDebug() << "Processing: " << line << endl;
-        QStringList wordList;
-        wordList.append(line.split(','));
-        sanitize(wordList);
+    // Convert raw csv lines into vector of string lists
+    buildRowsVec(lines, &rowsVec);
 
-        int row = ui->midTable->rowCount();
-        ui->midTable->insertRow(row);
+    // Remove runt or oversize rows from the rows vector
+    normalizeRowsVec(&rowsVec, minRequiredCol);
 
-        for(int col = 0, numCols = wordList.length(); col < numCols; col++)
-            ui->midTable->setItem(row, col, new QTableWidgetItem(wordList.at(col)));
-
-        // DEBUG
-        if(row > 50)
-            break;
-    }
+    // Populate the middle table with our vector of string lists
+    setRows(ui->midTable, rowsVec);
 
     // hide ignored columns in all tables
     QMutableStringListIterator i(ignoreColumns);
@@ -243,15 +242,31 @@ void finance::calculateTotals() {
     calcTotal(*ui->rightTable, ui->rightTotal);
 }
 
-void finance::movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTable,
+void finance::movePredeterminedRows(QTableWidget* fromTable,
+                                    QTableWidget* toTable,
                                     const QStringList& list) {
     QStringListIterator i(list);
     while(i.hasNext()) {
-        const QString s = i.next();
+        const QString& s = i.next();
         qDebug() << "Checking for pre-determined item: " << s << endl;
-        for(int row = 1, end = fromTable->rowCount(); row < end; row++) {
-            if(fromTable->item(row, descriptionColumn)->text() == s) {
-                qDebug() << "Found on row: " << row << endl;
+        for(int row = 0, end = fromTable->rowCount(); row < end; row++) {
+            const QTableWidgetItem* wi = fromTable->item(row, descriptionColumn);
+            if(wi == nullptr) {
+                qDebug() << "Null widget item on row " << row
+                         << ", column " << descriptionColumn;
+                for(int c = 0, cmax = fromTable->columnCount(); c < cmax; c++) {
+                    const QTableWidgetItem* xwi = fromTable->item(row, c);
+                    qDebug() << "Col " << c << ": ";
+                    if(xwi != nullptr) {
+                        qDebug() << "    " << xwi->text();
+                    } else {
+                        qDebug() << "    null!";
+                    }
+
+                }
+            }
+            if(wi->text() == s) {
+                qDebug() << "    Found on row: " << row;
                 moveRow(fromTable, toTable, row);
                 // we just reduced the max row count by 1
                 end--;
@@ -278,4 +293,37 @@ void finance::midTableMoveRight(int row) {
 void finance::rightTableMoveLeft(int row) {
     moveRow(ui->rightTable, ui->midTable, row);
     calculateTotals();
+}
+
+void finance::setRows(QTableWidget* tbl, const StringListVec& lv) {
+    // remove existing rows
+    tbl->setRowCount(0);
+
+    // create new rows
+    const int numRows = lv.length();
+
+    tbl->setRowCount(numRows);
+
+    // Walk the StringListVec populating rows and cols
+    // Reject any runt rows
+    for(int row = 0; row < numRows; row++) {
+        const QStringList& qsl = lv.at(row);
+
+        // DEBUG TOP
+        if(row == 272) {
+            qDebug() << "DEBUG row 272: " << qsl << endl;
+        }
+        // DEBUG BOTTOM
+
+        // Rows have varying length
+        const int colMax = qsl.length();
+        for(int col = 0; col < colMax; col++) {
+            QTableWidgetItem* twi = new QTableWidgetItem(qsl.at(col));
+            if(twi == nullptr) {
+                QMessageBox::critical(this, tr("Error"), tr("Out of memory creating QTableWidgetItem"));
+                exit(-1);
+            }
+            tbl->setItem(row, col, twi);
+        }
+    }
 }
