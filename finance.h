@@ -54,6 +54,7 @@ private:
     void movePredeterminedRows();
 
     void resetTables();
+    void hideIgnoredColumns(const QStringList& hdrList);
 
     void initMonthVec();
 

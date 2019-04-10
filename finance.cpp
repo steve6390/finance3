@@ -85,7 +85,7 @@ void finance::readSettings()
     int end = settings.beginReadArray("IgnoreColumns");
     for(int i = 0; i < end; i++) {
         settings.setArrayIndex(i);
-        ignoreColumns.append(settings.value("Description").toString());
+        ignoreColumns.append(settings.value("name").toString());
     }
     settings.endArray();
 
@@ -201,20 +201,25 @@ void finance::on_actionOpen_triggered()
     // Remove runt or oversize rows from the rows vector
     normalizeRowsVec(&fileRowsVec, minRequiredCol);
 
+    // Hide ignored columns per user settings
+    hideIgnoredColumns(headerList);
+
+    // Setup tables for the selected date range.
+    // Currently, the range is all days in the specified month.
+    resetTables();
+}
+
+void finance::hideIgnoredColumns(const QStringList& hdrList) {
     // hide ignored columns in all tables
     QMutableStringListIterator i(ignoreColumns);
     while(i.hasNext()){
-        int col = headerList.indexOf(i.next());
+        int col = hdrList.indexOf(i.next());
         if(col == -1)
             continue;
         ui->leftTable->hideColumn(col);
         ui->midTable->hideColumn(col);
         ui->rightTable->hideColumn(col);
     }
-
-    // Setup tables for the selected date range.
-    // Currently, the range is all days in the specified month.
-    resetTables();
 }
 
 void finance::initMonthVec() {
