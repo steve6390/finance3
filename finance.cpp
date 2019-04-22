@@ -223,7 +223,7 @@ void finance::hideIgnoredColumns(const QStringList& hdrList) {
 }
 
 void finance::initMonthVec() {
-    // clear existing entrys from the month vec
+    // clear existing entriess from the month vec
     monthRowsVec.clear();
     StringListVecItor i(fileRowsVec);
     const QDate& date = ui->dateEdit->date();
@@ -372,10 +372,13 @@ void finance::setRows(QTableWidget* tbl, const StringListVec& lv) {
 
 void finance::on_saveLeftButton_clicked() {
     qDebug() << "I'm in on_saveLeftButton_Clicked()!";
-    QFileDialog saveAsDlg;
-    saveAsDlg.selectFile("CoolDefault.csv");
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Save File"), QString(),
-            tr("CSV Files (*.csv) ;; All files (*.*)"));
+    // Build the default filename.
+    const QDate& date = ui->dateEdit->date();
+    QString defaultName = ui->labelLeft->text() + "_";
+    defaultName += getMonthName(date) + ".csv";
+    // Create a dialog box for saving a file
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+            defaultName, tr("CSV Files (*.csv) ;; All files (*.*)"));
 
     qDebug() << "Selected file name is " << fileName << endl;
     if(printTableAsCSV(ui->leftTable, fileName)) {

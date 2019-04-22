@@ -28,14 +28,14 @@
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QLabel" name="labelJoint">
+       <widget class="QLabel" name="lavelRight">
         <property name="text">
          <string>Joint</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="labelMine">
+       <widget class="QLabel" name="labelLeft">
         <property name="text">
          <string>Mine</string>
         </property>
@@ -62,7 +62,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="labelUndecided">
+       <widget class="QLabel" name="labelMid">
         <property name="text">
          <string>Undecided</string>
         </property>

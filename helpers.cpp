@@ -88,6 +88,8 @@ int printTableAsCSV(const QTableWidget* tbl, const QString& fname) {
     for (int r = 0, rowEnd = tbl->rowCount(); r < rowEnd; r++) {
         // Print each table cell in the row with , separation
         for (int c = 0, colEnd = tbl->columnCount(); c < colEnd; c++) {
+            if(tbl->isColumnHidden(c))
+                continue;
             out << tbl->item(r,c)->text() + ", ";
         }
         out << "\n"; // done with row
@@ -95,4 +97,12 @@ int printTableAsCSV(const QTableWidget* tbl, const QString& fname) {
 
     csvFile.close();
     return 0;
+}
+
+QString getMonthName(const QDate& date) {
+    static const char* months[12] = { "January", "February", "March",
+                                      "April", "May", "June", "July",
+                                      "August", "September", "October",
+                                      "November", "December"};
+    return months[date.month() -1];
 }

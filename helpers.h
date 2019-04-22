@@ -6,6 +6,7 @@
 #include <QVectorIterator>
 #include <QTableWidget>
 #include <QRegExp>
+#include <QDate>
 
 using StringListVec = QVector<QStringList>;
 using StringListVecItor = QVectorIterator<QStringList>;
@@ -76,4 +77,11 @@ void getDateFromString(const QString& str, int* day, int* month, int* year);
  */
 int printTableAsCSV(const QTableWidget* tbl, const QString& fname);
 
+/**
+ * @brief getMonthName Return the month name, e.g. "January" from the
+ *        the specified QDate object.
+ * @param date The date
+ * @return Month name string.
+ */
+QString getMonthName(const QDate& date);
 #endif // HELPERS_H
