@@ -375,7 +375,8 @@ void finance::on_saveLeftButton_clicked() {
     // Build the default filename.
     const QDate& date = ui->dateEdit->date();
     QString defaultName = ui->labelLeft->text() + "_";
-    defaultName += getMonthName(date) + ".csv";
+    defaultName += getMonthName(date) + "_";
+    defaultName += QString::number(date.year()) + ".csv";
     // Create a dialog box for saving a file
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
             defaultName, tr("CSV Files (*.csv) ;; All files (*.*)"));
