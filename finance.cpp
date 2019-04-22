@@ -377,12 +377,13 @@ void finance::on_saveLeftButton_clicked() {
     QString defaultName = ui->leftNameEdit->text() + "_";
     defaultName += getMonthName(date) + "_";
     defaultName += QString::number(date.year()) + ".csv";
+    QString trailer = "\n" + ui->leftTotal->text() + "\n";
     // Create a dialog box for saving a file
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
             defaultName, tr("CSV Files (*.csv) ;; All files (*.*)"));
 
     qDebug() << "Selected file name is " << fileName << endl;
-    if(printTableAsCSV(ui->leftTable, fileName)) {
+    if(printTableAsCSV(ui->leftTable, fileName, QString(), trailer)) {
         QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
         return;
     }

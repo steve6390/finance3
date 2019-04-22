@@ -78,13 +78,15 @@ void getDateFromString(const QString& str, int* day, int* month, int* year) {
     *year = ql.at(3).toInt();
 }
 
-int printTableAsCSV(const QTableWidget* tbl, const QString& fname) {
+int printTableAsCSV(const QTableWidget* tbl, const QString& fname,
+                    const QString& header, const QString& trailer ) {
     QFile csvFile(fname);
     if(!csvFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return -1;
 
     QTextStream out(&csvFile);
 
+    out << header;
     for (int r = 0, rowEnd = tbl->rowCount(); r < rowEnd; r++) {
         // Print each table cell in the row with , separation
         for (int c = 0, colEnd = tbl->columnCount(); c < colEnd; c++) {
@@ -94,7 +96,7 @@ int printTableAsCSV(const QTableWidget* tbl, const QString& fname) {
         }
         out << "\n"; // done with row
     }
-
+    out << trailer;
     csvFile.close();
     return 0;
 }
