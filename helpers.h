@@ -67,4 +67,13 @@ void normalizeRowsVec(StringListVec* rv, int minLength);
  */
 void getDateFromString(const QString& str, int* day, int* month, int* year);
 
+/**
+ * @brief printTableAsCSV Saves the specified QTableWidget as a CSV file.
+ * @param tbl The table to save.
+ * @param fname The file name
+ * @return Error code, or 0 on success.  Error codes:
+ *         -1: Failed to open file
+ */
+int printTableAsCSV(const QTableWidget* tbl, const QString& fname);
+
 #endif // HELPERS_H

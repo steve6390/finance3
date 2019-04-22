@@ -1,12 +1,13 @@
 #include "helpers.h"
 #include <QDebug>
 #include <QRegExp>
+#include <QFile>
 
 // Returns a whole row and removes that row from the table.
 QList<QTableWidgetItem*> takeRow(QTableWidget* tbl, int row)
 {
     QList<QTableWidgetItem*> rowItems;
-    for (int col = 0, colCount = tbl->columnCount(); col < colCount; ++col)
+    for (int col = 0, colEnd = tbl->columnCount(); col < colEnd; ++col)
         rowItems << tbl->takeItem(row, col);
     tbl->removeRow(row);
     return rowItems;
@@ -21,7 +22,7 @@ void addRow(QTableWidget* tbl, const QList<QTableWidgetItem*>& rowItems)
     int row = tbl->rowCount();
     tbl->insertRow(row);
 
-    for (int col = 0, colCount = tbl->columnCount(); col < colCount; ++col)
+    for (int col = 0, colEnd = tbl->columnCount(); col < colEnd; ++col)
         tbl->setItem(row, col, rowItems.at(col));
 }
 
@@ -75,4 +76,23 @@ void getDateFromString(const QString& str, int* day, int* month, int* year) {
     *month = ql.at(1).toInt();
     *day = ql.at(2).toInt();
     *year = ql.at(3).toInt();
+}
+
+int printTableAsCSV(const QTableWidget* tbl, const QString& fname) {
+    QFile csvFile(fname);
+    if(!csvFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return -1;
+
+    QTextStream out(&csvFile);
+
+    for (int r = 0, rowEnd = tbl->rowCount(); r < rowEnd; r++) {
+        // Print each table cell in the row with , separation
+        for (int c = 0, colEnd = tbl->columnCount(); c < colEnd; c++) {
+            out << tbl->item(r,c)->text() + ", ";
+        }
+        out << "\n"; // done with row
+    }
+
+    csvFile.close();
+    return 0;
 }

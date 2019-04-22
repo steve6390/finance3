@@ -289,12 +289,12 @@ void finance::movePredeterminedRows(QTableWidget* fromTable,
     while(i.hasNext()) {
         const QString& s = i.next();
         qDebug() << "Checking for pre-determined item: " << s << endl;
-        for(int row = 0, end = fromTable->rowCount(); row < end; row++) {
+        for(int row = 0, rowEnd = fromTable->rowCount(); row < rowEnd; row++) {
             const QTableWidgetItem* wi = fromTable->item(row, descriptionColumn);
             if(wi == nullptr) {
                 qDebug() << "Null widget item on row " << row
                          << ", column " << descriptionColumn;
-                for(int c = 0, cmax = fromTable->columnCount(); c < cmax; c++) {
+                for(int c = 0, colEnd = fromTable->columnCount(); c < colEnd; c++) {
                     const QTableWidgetItem* xwi = fromTable->item(row, c);
                     qDebug() << "Col " << c << ": ";
                     if(xwi != nullptr) {
@@ -311,7 +311,7 @@ void finance::movePredeterminedRows(QTableWidget* fromTable,
                 qDebug() << "    Found on row: " << row;
                 moveRow(fromTable, toTable, row);
                 // we just reduced the max row count by 1
-                end--;
+                rowEnd--;
             }
         }
     }
@@ -367,5 +367,19 @@ void finance::setRows(QTableWidget* tbl, const StringListVec& lv) {
             }
             tbl->setItem(row, col, twi);
         }
+    }
+}
+
+void finance::on_saveLeftButton_clicked() {
+    qDebug() << "I'm in on_saveLeftButton_Clicked()!";
+    QFileDialog saveAsDlg;
+    saveAsDlg.selectFile("CoolDefault.csv");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Save File"), QString(),
+            tr("CSV Files (*.csv) ;; All files (*.*)"));
+
+    qDebug() << "Selected file name is " << fileName << endl;
+    if(printTableAsCSV(ui->leftTable, fileName)) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+        return;
     }
 }

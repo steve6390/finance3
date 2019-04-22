@@ -34,6 +34,8 @@ private slots:
     void rightTableMoveLeft(int row);
     void dateUpdate(const QDate& date);
 
+    void on_saveLeftButton_clicked();
+
 private:
     Ui::finance *ui;
     QPixmap leftCursorPixmap = QPixmap(":/images/cursor_left.png");
@@ -57,7 +59,6 @@ private:
     void hideIgnoredColumns(const QStringList& hdrList);
 
     void initMonthVec();
-
 
     void writeSettings();
     void readSettings();
