@@ -401,6 +401,6 @@ void finance::on_saveMidButton_clicked() {
 }
 
 void finance::on_saveRightButton_clicked() {
-    qDebug() << "I'm in on_saveMidButton_Clicked()!";
+    qDebug() << "I'm in on_saveRightButton_Clicked()!";
     saveTable(ui->rightNameEdit->text(), ui->rightTotal->text(), ui->rightTable);
 }
