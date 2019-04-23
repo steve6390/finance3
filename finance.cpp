@@ -372,19 +372,35 @@ void finance::setRows(QTableWidget* tbl, const StringListVec& lv) {
 
 void finance::on_saveLeftButton_clicked() {
     qDebug() << "I'm in on_saveLeftButton_Clicked()!";
+    saveTable(ui->leftNameEdit->text(), ui->leftTotal->text(), ui->leftTable);
+}
+
+void finance::saveTable(const QString& tblName, const QString& totalText,
+                        const QTableWidget* tbl) {
+    qDebug() << "I'm in saveTable!";
     // Build the default filename.
     const QDate& date = ui->dateEdit->date();
-    QString defaultName = ui->leftNameEdit->text() + "_";
+    QString defaultName = tblName + "_";
     defaultName += getMonthName(date) + "_";
     defaultName += QString::number(date.year()) + ".csv";
-    QString trailer = "\n" + ui->leftTotal->text() + "\n";
+    QString trailer = "\n" + totalText + "\n";
     // Create a dialog box for saving a file
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
             defaultName, tr("CSV Files (*.csv) ;; All files (*.*)"));
 
     qDebug() << "Selected file name is " << fileName << endl;
-    if(printTableAsCSV(ui->leftTable, fileName, QString(), trailer)) {
+    if(printTableAsCSV(tbl, fileName, QString(), trailer)) {
         QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
         return;
     }
+}
+
+void finance::on_saveMidButton_clicked() {
+    qDebug() << "I'm in on_saveMidButton_Clicked()!";
+    saveTable(ui->midNameEdit->text(), ui->midTotal->text(), ui->midTable);
+}
+
+void finance::on_saveRightButton_clicked() {
+    qDebug() << "I'm in on_saveMidButton_Clicked()!";
+    saveTable(ui->rightNameEdit->text(), ui->rightTotal->text(), ui->rightTable);
 }

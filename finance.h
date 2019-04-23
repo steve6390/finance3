@@ -36,6 +36,10 @@ private slots:
 
     void on_saveLeftButton_clicked();
 
+    void on_saveMidButton_clicked();
+
+    void on_saveRightButton_clicked();
+
 private:
     Ui::finance *ui;
     QPixmap leftCursorPixmap = QPixmap(":/images/cursor_left.png");
@@ -52,6 +56,10 @@ private:
     void setRows(QTableWidget* tbl, const StringListVec& lv);
 
     void calcTotal(const QTableWidget& tbl, QLabel* total);
+
+    void saveTable(const QString& tblName, const QString& totalText,
+                   const QTableWidget* tbl);
+
     void calculateTotals();
     void movePredeterminedRows();
 
