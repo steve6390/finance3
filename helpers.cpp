@@ -86,13 +86,30 @@ int printTableAsCSV(const QTableWidget* tbl, const QString& fname,
 
     QTextStream out(&csvFile);
 
+    QVector<int> max_width_vec(tbl->columnCount());
+
+    // First, find the maximum length text item in each column.
+    for (int c = 0, colEnd = tbl->columnCount(); c < colEnd; c++) {
+        if(tbl->isColumnHidden(c))
+            continue;
+        int len_max = 0; // initialize with zero length
+        for (int r = 0, rowEnd = tbl->rowCount(); r < rowEnd; r++) {
+            const QString temp = tbl->item(r,c)->text();
+            len_max = std::max(temp.length(), len_max);
+        }
+        max_width_vec[c] = len_max;
+    }
+
     out << header;
     for (int r = 0, rowEnd = tbl->rowCount(); r < rowEnd; r++) {
         // Print each table cell in the row with , separation
         for (int c = 0, colEnd = tbl->columnCount(); c < colEnd; c++) {
             if(tbl->isColumnHidden(c))
                 continue;
-            out << tbl->item(r,c)->text() + ", ";
+            const QString temp = tbl->item(r,c)->text() + ", ";
+            // +2 for the comma and space
+            const QString temp2 = temp.rightJustified(max_width_vec[c] + 2);
+            out << temp2;
         }
         out << "\n"; // done with row
     }

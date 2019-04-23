@@ -375,6 +375,16 @@ void finance::on_saveLeftButton_clicked() {
     saveTable(ui->leftNameEdit->text(), ui->leftTotal->text(), ui->leftTable);
 }
 
+void finance::on_saveMidButton_clicked() {
+    qDebug() << "I'm in on_saveMidButton_Clicked()!";
+    saveTable(ui->midNameEdit->text(), ui->midTotal->text(), ui->midTable);
+}
+
+void finance::on_saveRightButton_clicked() {
+    qDebug() << "I'm in on_saveRightButton_Clicked()!";
+    saveTable(ui->rightNameEdit->text(), ui->rightTotal->text(), ui->rightTable);
+}
+
 void finance::saveTable(const QString& tblName, const QString& totalText,
                         const QTableWidget* tbl) {
     qDebug() << "I'm in saveTable!";
@@ -395,12 +405,3 @@ void finance::saveTable(const QString& tblName, const QString& totalText,
     }
 }
 
-void finance::on_saveMidButton_clicked() {
-    qDebug() << "I'm in on_saveMidButton_Clicked()!";
-    saveTable(ui->midNameEdit->text(), ui->midTotal->text(), ui->midTable);
-}
-
-void finance::on_saveRightButton_clicked() {
-    qDebug() << "I'm in on_saveRightButton_Clicked()!";
-    saveTable(ui->rightNameEdit->text(), ui->rightTotal->text(), ui->rightTable);
-}
