@@ -48,7 +48,11 @@ void finance::writeSettings() {
     settings.beginGroup("MainWindow");
     settings.setValue("size", size());
     settings.setValue("pos", pos());
+    settings.setValue("left_name", ui->leftNameEdit->text());
+    settings.setValue("mid_name", ui->midNameEdit->text());
+    settings.setValue("right_name", ui->rightNameEdit->text());
     settings.endGroup();
+
 
     settings.beginWriteArray("IgnoreColumns");
     for(int i = 0, end = ignoreColumns.count(); i < end; i++) {
@@ -80,6 +84,9 @@ void finance::readSettings()
     settings.beginGroup("MainWindow");
     resize(settings.value("size", QSize(1024, 768)).toSize());
     move(settings.value("pos", QPoint(200, 200)).toPoint());
+    ui->leftNameEdit->setText(settings.value("left_name").toString());
+    ui->midNameEdit->setText(settings.value("mid_name").toString());
+    ui->rightNameEdit->setText(settings.value("right_name").toString());
     settings.endGroup();
 
     int end = settings.beginReadArray("IgnoreColumns");
