@@ -191,8 +191,9 @@ void finance::on_actionOpen_triggered()
     minRequiredCol = std::max(minRequiredCol, dateColumn);
 
     // make sure our table has enough columns
-    int numCols = ui->midTable->columnCount();
-    for(int end = headerList.length(); numCols < end; numCols++) {
+
+    for(int numCols = ui->midTable->columnCount(),
+        end = headerList.length(); numCols < end; numCols++) {
         ui->leftTable->insertColumn(numCols);
         ui->midTable->insertColumn(numCols);
         ui->rightTable->insertColumn(numCols);
