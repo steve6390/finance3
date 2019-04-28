@@ -158,6 +158,8 @@ void finance::on_actionOpen_triggered()
     file.close();
 
     // Get the list of comma separated header row titles
+    // In addition to the columns in the CSV file, we also add a "perm?"
+    // column with a checkbox.
     QStringList headerList;
     headerList.append(lines.at(0).split(','));
     sanitize(&headerList);
@@ -167,41 +169,7 @@ void finance::on_actionOpen_triggered()
     // a table entry.
     lines.removeFirst();
 
-    // As we get column info, also calculate the largest required column.
-    // We don't care about per row length variations larger than this column.
-    descriptionColumn = headerList.indexOf("Description");
-    if(descriptionColumn == -1) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Description' column!"));
-        return;
-    }
-    minRequiredCol = std::max(minRequiredCol, descriptionColumn);
-
-    amountColumn = headerList.indexOf("Amount");
-    if(amountColumn == -1) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Amount' column!"));
-        return;
-    }
-    minRequiredCol = std::max(minRequiredCol, amountColumn);
-
-    dateColumn = headerList.indexOf("Date");
-    if(amountColumn == -1) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Date' column!"));
-        return;
-    }
-    minRequiredCol = std::max(minRequiredCol, dateColumn);
-
-    // make sure our table has enough columns
-
-    for(int numCols = ui->midTable->columnCount(),
-        end = headerList.length(); numCols < end; numCols++) {
-        ui->leftTable->insertColumn(numCols);
-        ui->midTable->insertColumn(numCols);
-        ui->rightTable->insertColumn(numCols);
-    }
-
-    ui->leftTable->setHorizontalHeaderLabels(headerList);
-    ui->midTable->setHorizontalHeaderLabels(headerList);
-    ui->rightTable->setHorizontalHeaderLabels(headerList);
+    initColumns(headerList);
 
     // Convert raw csv lines into vector of string lists
     buildRowsVec(lines, &fileRowsVec);
@@ -228,6 +196,45 @@ void finance::hideIgnoredColumns(const QStringList& hdrList) {
         ui->midTable->hideColumn(col);
         ui->rightTable->hideColumn(col);
     }
+}
+
+void finance::initColumns(const QStringList& hdrList) {
+    // As we get column info, also calculate the largest required column.
+    // We don't care about per row length variations larger than this column.
+    descriptionColumn = hdrList.indexOf("Description");
+    if(descriptionColumn == -1) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Description' column!"));
+        return;
+    }
+    minRequiredCol = std::max(minRequiredCol, descriptionColumn);
+
+    amountColumn = hdrList.indexOf("Amount");
+    if(amountColumn == -1) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Amount' column!"));
+        return;
+    }
+    minRequiredCol = std::max(minRequiredCol, amountColumn);
+
+    dateColumn = hdrList.indexOf("Date");
+    if(amountColumn == -1) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Date' column!"));
+        return;
+    }
+    minRequiredCol = std::max(minRequiredCol, dateColumn);
+
+    // make sure our table has enough columns
+    // All tables have the same number of columns,
+    // so just reference from the middle table
+    for(int numCols = ui->midTable->columnCount(),
+        end = hdrList.length(); numCols < end; numCols++) {
+        ui->leftTable->insertColumn(numCols);
+        ui->midTable->insertColumn(numCols);
+        ui->rightTable->insertColumn(numCols);
+    }
+
+    ui->leftTable->setHorizontalHeaderLabels(hdrList);
+    ui->midTable->setHorizontalHeaderLabels(hdrList);
+    ui->rightTable->setHorizontalHeaderLabels(hdrList);
 }
 
 void finance::initMonthVec() {

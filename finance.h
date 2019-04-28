@@ -65,6 +65,7 @@ private:
 
     void resetTables();
     void hideIgnoredColumns(const QStringList& hdrList);
+    void initColumns(const QStringList& hdrList);
 
     void initMonthVec();
 
