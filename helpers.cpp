@@ -139,10 +139,6 @@ bool cellMatch(const QTableWidget* tbl, int row, int col,
     if(wi == nullptr)
         return false;
     QString wistr = wi->text();
-    for(const auto& s : strList) {
-        if(wistr == s)
-            return true;
-    }
-    return false;
+    return strList.contains(wistr);
 }
 

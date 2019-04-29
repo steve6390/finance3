@@ -412,11 +412,15 @@ void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
     if(selection == nullptr)
         return; // nothing selected
 
+    const QString itemDesc = ui->leftTable->item(row,descriptionColumn)->text();
     if(selection->text() == "Permanent") {
-        if(selection->isChecked())
-            qDebug() << "Adding to permanent list!";
-        else
-            qDebug() << "Remove from permanent list!";
+        if(selection->isChecked()) {
+            qDebug() << "Adding '" << itemDesc << "' to permanent list!";
+            leftPermList.append(itemDesc);
+        } else {
+            qDebug() << "Removing '" << itemDesc << "' from permanent list!";
+            leftPermList.removeAll(itemDesc);
+        }
     }
 }
 
