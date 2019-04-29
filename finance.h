@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QDate>
 #include "helpers.h"
+#include "tablecontextmenu.h"
 
 namespace Ui {
 class finance;
@@ -39,6 +40,8 @@ private slots:
     void on_saveMidButton_clicked();
 
     void on_saveRightButton_clicked();
+
+    void on_leftTable_customContextMenuRequested(const QPoint &pos);
 
 private:
     Ui::finance *ui;
@@ -75,6 +78,8 @@ private:
     QStringList ignoreColumns;
     QStringList jointList;
     QStringList mineList;
+
+    TableContextMenu tblContextMenu;
 
     // Interesting column numbers set in on_actionOpen_triggered
     int descriptionColumn = -1;

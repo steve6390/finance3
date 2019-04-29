@@ -125,3 +125,23 @@ QString getMonthName(const QDate& date) {
                                       "November", "December"};
     return months[date.month() -1];
 }
+
+bool cellMatch(const QTableWidget& tbl, int row, int col, const QString& str) {
+    const QTableWidgetItem* wi = tbl.item(row, col);
+    if(wi == nullptr)
+        return false;
+    return wi->text() == str;
+}
+
+bool cellMatch(const QTableWidget& tbl, int row, int col,
+               const QStringList& strList) {
+    const QTableWidgetItem* wi = tbl.item(row, col);
+    if(wi == nullptr)
+        return false;
+    for(const auto& s : strList) {
+        if(wi->text() == s)
+            return true;
+    }
+    return false;
+}
+

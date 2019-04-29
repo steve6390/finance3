@@ -123,11 +123,9 @@ finance::~finance() {
     delete ui;
 }
 
-
-
 void finance::on_actionOpen_triggered()
 {
-    qDebug() << "I'm in the action!";
+    qDebug() << "I'm in actionOpen_triggered!";
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
             tr("CSV Files (*.csv) ;; All files (*.*)"));
 
@@ -305,24 +303,7 @@ void finance::movePredeterminedRows(QTableWidget* fromTable,
         const QString& s = i.next();
         qDebug() << "Checking for pre-determined item: " << s << endl;
         for(int row = 0, rowEnd = fromTable->rowCount(); row < rowEnd; row++) {
-            const QTableWidgetItem* wi = fromTable->item(row, descriptionColumn);
-            if(wi == nullptr) {
-                qDebug() << "Null widget item on row " << row
-                         << ", column " << descriptionColumn;
-                for(int c = 0, colEnd = fromTable->columnCount(); c < colEnd; c++) {
-                    const QTableWidgetItem* xwi = fromTable->item(row, c);
-                    qDebug() << "Col " << c << ": ";
-                    if(xwi != nullptr) {
-                        qDebug() << "    " << xwi->text();
-                    } else {
-                        qDebug() << "    null!";
-                    }
-                }
-                QMessageBox::critical(this, tr("Error"),
-                                      tr("table has null description!"));
-                return;
-            }
-            if(wi->text() == s) {
+            if(cellMatch(*fromTable, row, descriptionColumn, list)) {
                 qDebug() << "    Found on row: " << row;
                 moveRow(fromTable, toTable, row);
                 // we just reduced the max row count by 1
@@ -365,13 +346,6 @@ void finance::setRows(QTableWidget* tbl, const StringListVec& lv) {
     // Reject any runt rows
     for(int row = 0; row < numRows; row++) {
         const QStringList& qsl = lv.at(row);
-
-        // DEBUG TOP
-        if(row == 272) {
-            qDebug() << "DEBUG row 272: " << qsl << endl;
-        }
-        // DEBUG BOTTOM
-
         // Rows have varying length
         const int colMax = qsl.length();
         for(int col = 0; col < colMax; col++) {
@@ -418,5 +392,24 @@ void finance::saveTable(const QString& tblName, const QString& totalText,
         QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
         return;
     }
+}
+
+void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
+{
+    QPoint globalPos = ui->leftTable->viewport()->mapToGlobal(pos);
+    int row = ui->leftTable->rowAt(pos.y());
+    qDebug() << "I'm the right click menu at left table row = " << row;
+
+    QAction* selection = tblContextMenu.exec(globalPos);
+    if(selection == nullptr)
+        return; // nothing selected
+
+    if(selection->text() == "Permanent") {
+        if(selection->isChecked())
+            qDebug() << "Adding to permanent list!";
+        else
+            qDebug() << "Remove from permanent list!";
+    }
+
 }
 

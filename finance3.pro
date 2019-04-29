@@ -8,7 +8,7 @@ QT       += core gui
 
 # where is C++17 support???
 #QMAKE_CXXFLAGS = -std=c++17
-#CONFIG = c++1z
+CONFIG += c++17
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -32,12 +32,14 @@ SOURCES += \
         main.cpp \
     finance.cpp \
     helpers.cpp \
-    financetablewidget.cpp
+    financetablewidget.cpp \
+    tablecontextmenu.cpp
 
 HEADERS += \
     finance.h \
     helpers.h \
-    financetablewidget.h
+    financetablewidget.h \
+    tablecontextmenu.h
 
 FORMS += \
     finance.ui
