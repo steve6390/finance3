@@ -382,6 +382,9 @@ void finance::saveTable(const QString& tblName, const QString& totalText,
     QString defaultName = tblName + "_";
     defaultName += getMonthName(date) + "_";
     defaultName += QString::number(date.year()) + ".csv";
+    // Replace all straggling spaces with '_'.
+    defaultName.replace(' ', '_');
+
     QString trailer = "\n" + totalText + "\n";
     // Create a dialog box for saving a file
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
@@ -399,6 +402,9 @@ void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
     QPoint globalPos = ui->leftTable->viewport()->mapToGlobal(pos);
     // Get the row where the right click happened
     const int row = ui->leftTable->rowAt(pos.y());
+
+    if(row < 0)
+        return;  // right click not on actual row
 
     // Determine if the row contains a permanently assigned item
     const bool perm = cellMatch(ui->leftTable, row, descriptionColumn,
