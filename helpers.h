@@ -100,7 +100,7 @@ QString getMonthName(const QDate& date);
  * @param str The string to compare with cell contents.
  * @return True if the cell matches the string
  */
-bool cellMatch(const QTableWidget& tbl, int row, int col, const QString& str);
+bool cellMatch(const QTableWidget* tbl, int row, int col, const QString& str);
 
 /**
  * @brief cellMatch Returns true if the content of the cell at row,col
@@ -111,7 +111,7 @@ bool cellMatch(const QTableWidget& tbl, int row, int col, const QString& str);
  * @param strList The list of strings to compare with cell contents.
  * @return True if the cell matches the string
  */
-bool cellMatch(const QTableWidget& tbl, int row, int col,
+bool cellMatch(const QTableWidget* tbl, int row, int col,
                const QStringList& strList);
 
 #endif // HELPERS_H

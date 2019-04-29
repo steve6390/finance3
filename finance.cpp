@@ -62,16 +62,16 @@ void finance::writeSettings() {
     settings.endArray();
 
     settings.beginWriteArray("Right");
-    for(int i = 0, end = jointList.count(); i < end; i++) {
+    for(int i = 0, end = leftPermList.count(); i < end; i++) {
         settings.setArrayIndex(i);
-        settings.setValue("Description",jointList.at(i));
+        settings.setValue("Description",leftPermList.at(i));
     }
     settings.endArray();
 
     settings.beginWriteArray("Left");
-    for(int i = 0, end = mineList.count(); i < end; i++) {
+    for(int i = 0, end = rightPermList.count(); i < end; i++) {
         settings.setArrayIndex(i);
-        settings.setValue("Description",mineList.at(i));
+        settings.setValue("Description",rightPermList.at(i));
     }
     settings.endArray();
 
@@ -99,14 +99,14 @@ void finance::readSettings()
     end = settings.beginReadArray("Right");
     for(int i = 0; i < end; i++) {
         settings.setArrayIndex(i);
-        jointList.append(settings.value("Description").toString());
+        leftPermList.append(settings.value("Description").toString());
     }
     settings.endArray();
 
     end = settings.beginReadArray("Left");
     for(int i = 0; i < end; i++) {
         settings.setArrayIndex(i);
-        mineList.append(settings.value("Description").toString());
+        rightPermList.append(settings.value("Description").toString());
     }
     settings.endArray();
 
@@ -266,8 +266,8 @@ void finance::resetTables() {
     // Populate the middle table with our vector of string lists
     setRows(ui->midTable, monthRowsVec);
 
-    movePredeterminedRows(ui->midTable, ui->rightTable, jointList);
-    movePredeterminedRows(ui->midTable, ui->leftTable, mineList);
+    movePredeterminedRows(ui->midTable, ui->rightTable, rightPermList);
+    movePredeterminedRows(ui->midTable, ui->leftTable, leftPermList);
     calculateTotals();
 }
 
@@ -303,7 +303,7 @@ void finance::movePredeterminedRows(QTableWidget* fromTable,
         const QString& s = i.next();
         qDebug() << "Checking for pre-determined item: " << s << endl;
         for(int row = 0, rowEnd = fromTable->rowCount(); row < rowEnd; row++) {
-            if(cellMatch(*fromTable, row, descriptionColumn, list)) {
+            if(cellMatch(fromTable, row, descriptionColumn, list)) {
                 qDebug() << "    Found on row: " << row;
                 moveRow(fromTable, toTable, row);
                 // we just reduced the max row count by 1
@@ -397,9 +397,17 @@ void finance::saveTable(const QString& tblName, const QString& totalText,
 void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
 {
     QPoint globalPos = ui->leftTable->viewport()->mapToGlobal(pos);
-    int row = ui->leftTable->rowAt(pos.y());
-    qDebug() << "I'm the right click menu at left table row = " << row;
+    // Get the row where the right click happened
+    const int row = ui->leftTable->rowAt(pos.y());
 
+    // Determine if the row contains a permanently assigned item
+    const bool perm = cellMatch(ui->leftTable, row, descriptionColumn,
+                                leftPermList);
+    qDebug() << "I'm the right click menu at left table row = " << row;
+    // Set the context menu for this item
+    tblContextMenu.setContext(perm);
+
+    // Get the user's selection, if any
     QAction* selection = tblContextMenu.exec(globalPos);
     if(selection == nullptr)
         return; // nothing selected
@@ -410,6 +418,5 @@ void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
         else
             qDebug() << "Remove from permanent list!";
     }
-
 }
 

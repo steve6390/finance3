@@ -76,8 +76,8 @@ private:
     void readSettings();
 
     QStringList ignoreColumns;
-    QStringList jointList;
-    QStringList mineList;
+    QStringList leftPermList;
+    QStringList rightPermList;
 
     TableContextMenu tblContextMenu;
 

@@ -126,20 +126,21 @@ QString getMonthName(const QDate& date) {
     return months[date.month() -1];
 }
 
-bool cellMatch(const QTableWidget& tbl, int row, int col, const QString& str) {
-    const QTableWidgetItem* wi = tbl.item(row, col);
+bool cellMatch(const QTableWidget* tbl, int row, int col, const QString& str) {
+    const QTableWidgetItem* wi = tbl->item(row, col);
     if(wi == nullptr)
         return false;
     return wi->text() == str;
 }
 
-bool cellMatch(const QTableWidget& tbl, int row, int col,
+bool cellMatch(const QTableWidget* tbl, int row, int col,
                const QStringList& strList) {
-    const QTableWidgetItem* wi = tbl.item(row, col);
+    const QTableWidgetItem* wi = tbl->item(row, col);
     if(wi == nullptr)
         return false;
+    QString wistr = wi->text();
     for(const auto& s : strList) {
-        if(wi->text() == s)
+        if(wistr == s)
             return true;
     }
     return false;
