@@ -285,7 +285,7 @@ void finance::calcTotal(const QTableWidget& tbl, QLabel* totalLabel) {
     // so just print with 2 decimals of precision
     // for the cents.
 
-    QString txt = "Total $" + QString::number(total, 'f', 2);
+    QString txt = "Total, $" + QString::number(total, 'f', 2);
     totalLabel->setText(txt);
 }
 
