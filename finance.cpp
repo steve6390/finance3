@@ -156,10 +156,9 @@ void finance::on_actionOpen_triggered()
     file.close();
 
     // Get the list of comma separated header row titles
-    // In addition to the columns in the CSV file, we also add a "perm?"
-    // column with a checkbox.
+    // We ignore commas surrounded by double-quotes
     QStringList headerList;
-    headerList.append(lines.at(0).split(','));
+    headerList.append(csvSplit(lines.at(0)));
     sanitize(&headerList);
 
     // We've finished processing the header row, so remove
@@ -430,3 +429,7 @@ void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
     }
 }
 
+
+void finance::on_addNewButton_clicked() {
+
+}

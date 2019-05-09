@@ -26,6 +26,9 @@
       </item>
       <item row="3" column="1">
        <widget class="FinanceTableWidget" name="midTable">
+        <property name="editTriggers">
+         <set>QAbstractItemView::DoubleClicked</set>
+        </property>
         <property name="rowCount">
          <number>0</number>
         </property>
@@ -156,14 +159,14 @@
       <item row="0" column="2">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>TextLabel</string>
+         <string/>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>TextLable</string>
+         <string>Month</string>
         </property>
        </widget>
       </item>
@@ -190,10 +193,17 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Month</string>
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="addNewButton">
+        <property name="text">
+         <string>Add New...</string>
         </property>
        </widget>
       </item>

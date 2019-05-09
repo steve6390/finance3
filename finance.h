@@ -43,6 +43,8 @@ private slots:
 
     void on_leftTable_customContextMenuRequested(const QPoint &pos);
 
+    void on_addNewButton_clicked();
+
 private:
     Ui::finance *ui;
     QPixmap leftCursorPixmap = QPixmap(":/images/cursor_left.png");

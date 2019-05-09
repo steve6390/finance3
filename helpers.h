@@ -114,4 +114,14 @@ bool cellMatch(const QTableWidget* tbl, int row, int col, const QString& str);
 bool cellMatch(const QTableWidget* tbl, int row, int col,
                const QStringList& strList);
 
+/**
+ * @brief csvSplit Splits a comma separated value string, while ignoring
+ * commas within double quotes.  Trims leading and trailing whitespace
+ * from each string.
+ * @param in String to split
+ * @return QStringList of split strings.  Commas and surrounding whitespace
+ * are trimmed.
+ */
+QStringList csvSplit(const QString& str);
+
 #endif // HELPERS_H

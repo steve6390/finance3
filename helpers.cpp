@@ -30,7 +30,7 @@ void buildRowsVec(const QStringList& lines, StringListVec* rv) {
     for(const auto& line : lines) {
         // qDebug() << "Processing: " << line << endl;
         QStringList wordList;
-        wordList.append(line.split(','));
+        wordList.append(csvSplit(line));
         sanitize(&wordList);
         rv->append(wordList);
     }
@@ -141,4 +141,56 @@ bool cellMatch(const QTableWidget* tbl, int row, int col,
     QString wistr = wi->text();
     return strList.contains(wistr);
 }
+
+QStringList csvSplit(const QString &str) {
+    QStringList result;
+    enum State {
+        QUOTED,
+        COMMA,
+        BODY
+    };
+
+    State state = BODY;
+    const int end = str.length();
+    int i = 0;
+    QString s;
+    while(i < end) {
+        const QChar c = str[i];
+        switch(state) {
+
+        // Record all until a quote or comma
+        case BODY:
+            if(c == ',') {
+                state = COMMA;
+            } else {
+                if(c == '\"') {
+                    // We found a quoted string
+                    state = QUOTED;
+                }
+                s.append(c);
+            }
+            ++i; // done with this char
+            break;
+
+        case COMMA:
+            // Add the current string to the list and start
+            // a new string.  The current string may be empty.
+            result.push_back(s.trimmed());
+            s.clear();
+            state = BODY;
+            break;
+
+        case QUOTED:
+            if(c == '\"') {
+                state = BODY;
+            }
+            s.append(c);
+            ++i; // done with this char
+            break;
+        }
+    }
+    return result;
+}
+
+
 
