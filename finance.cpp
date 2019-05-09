@@ -200,21 +200,32 @@ void finance::initColumns(const QStringList& hdrList) {
     // We don't care about per row length variations larger than this column.
     descriptionColumn = hdrList.indexOf("Description");
     if(descriptionColumn == -1) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Description' column!"));
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Could not find 'Description' column!"));
         return;
     }
     minRequiredCol = std::max(minRequiredCol, descriptionColumn);
 
     amountColumn = hdrList.indexOf("Amount");
     if(amountColumn == -1) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Amount' column!"));
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Could not find 'Amount' column!"));
         return;
     }
     minRequiredCol = std::max(minRequiredCol, amountColumn);
 
     dateColumn = hdrList.indexOf("Date");
     if(amountColumn == -1) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not find 'Date' column!"));
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Could not find 'Date' column!"));
+        return;
+    }
+    minRequiredCol = std::max(minRequiredCol, dateColumn);
+
+    transactionTypeColumn = hdrList.indexOf("Transaction Type");
+    if(amountColumn == -1) {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Could not find 'Transaction Type' column!"));
         return;
     }
     minRequiredCol = std::max(minRequiredCol, dateColumn);
@@ -275,7 +286,11 @@ void finance::calcTotal(const QTableWidget& tbl, QLabel* totalLabel) {
     for(int row = 0, end = tbl.rowCount(); row < end; row++) {
         QString amtString = tbl.item(row, amountColumn)->text();
         double amtVal = amtString.toDouble();
-        total += amtVal;
+        if(tbl.item(row,transactionTypeColumn)->text() == "credit") {
+            total -= amtVal;
+        } else {
+            total += amtVal;
+        }
     }
 
     // Storing dollars and cents in a double
@@ -355,6 +370,9 @@ void finance::setRows(QTableWidget* tbl, const StringListVec& lv) {
             }
             tbl->setItem(row, col, twi);
         }
+        if(tbl->item(row,transactionTypeColumn)->text() == "credit") {
+            setRowBackground(tbl, row, QColor(140,240,75));
+        }
     }
 }
 
@@ -429,7 +447,7 @@ void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
     }
 }
 
-
 void finance::on_addNewButton_clicked() {
-
+    const int numRows = ui->midTable->rowCount();
+    ui->midTable->setRowCount(numRows + 1);
 }

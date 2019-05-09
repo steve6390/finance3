@@ -87,6 +87,8 @@ private:
     int descriptionColumn = -1;
     int amountColumn = -1;
     int dateColumn = -1;
+    int transactionTypeColumn = -1;
+
     // Track the minimum column number we require
     int minRequiredCol = -1;
 

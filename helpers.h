@@ -124,4 +124,13 @@ bool cellMatch(const QTableWidget* tbl, int row, int col,
  */
 QStringList csvSplit(const QString& str);
 
+/**
+ * @brief setRowBackground Sets the background color for a table row.
+ * @param tbl The Table
+ * @param row Row to set background color
+ */
+void setRowBackground(QTableWidget* tbl, const int row, const QColor color);
+
+
+
 #endif // HELPERS_H

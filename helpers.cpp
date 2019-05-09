@@ -192,5 +192,10 @@ QStringList csvSplit(const QString &str) {
     return result;
 }
 
-
+void setRowBackground(QTableWidget* tbl, const int row, QColor color) {
+    for (int col = 0, colEnd = tbl->columnCount(); col < colEnd; ++col) {
+        QTableWidgetItem* item = tbl->item(row, col);
+        item->setBackgroundColor(color);
+    }
+}
 
