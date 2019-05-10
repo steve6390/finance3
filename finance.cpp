@@ -61,14 +61,14 @@ void finance::writeSettings() {
     }
     settings.endArray();
 
-    settings.beginWriteArray("Right");
+    settings.beginWriteArray("Left");
     for(int i = 0, end = leftPermList.count(); i < end; i++) {
         settings.setArrayIndex(i);
         settings.setValue("Description",leftPermList.at(i));
     }
     settings.endArray();
 
-    settings.beginWriteArray("Left");
+    settings.beginWriteArray("Right");
     for(int i = 0, end = rightPermList.count(); i < end; i++) {
         settings.setArrayIndex(i);
         settings.setValue("Description",rightPermList.at(i));
