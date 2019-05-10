@@ -452,4 +452,7 @@ void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
 void finance::on_addNewButton_clicked() {
     const int numRows = ui->midTable->rowCount();
     ui->midTable->setRowCount(numRows + 1);
+    ui->midTable->scrollToBottom();
+    ui->midTable->setCurrentCell(numRows, 0);
+    ui->midTable->edit(ui->midTable->currentIndex());
 }
