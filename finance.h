@@ -42,6 +42,7 @@ private slots:
     void on_saveRightButton_clicked();
 
     void on_leftTable_customContextMenuRequested(const QPoint &pos);
+    void on_rightTable_customContextMenuRequested(const QPoint &pos);
 
     void on_addNewButton_clicked();
 
@@ -53,6 +54,10 @@ private:
     QCursor rightCursor = QCursor(rightCursorPixmap, 53, 21);
     QPixmap bothCursorPixmap = QPixmap(":/images/cursor_both.png");
     QCursor bothCursor = QCursor(bothCursorPixmap, 3, 14);
+
+    void customContextMenuRequested(const QPoint &pos,
+                                    const QTableWidget* tbl,
+                                    QStringList* permList);
 
     void moveRow(QTableWidget* fromTable, QTableWidget* toTable, int row);
     void movePredeterminedRows(QTableWidget* fromTable, QTableWidget* toTable,

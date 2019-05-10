@@ -96,14 +96,14 @@ void finance::readSettings()
     }
     settings.endArray();
 
-    end = settings.beginReadArray("Right");
+    end = settings.beginReadArray("Left");
     for(int i = 0; i < end; i++) {
         settings.setArrayIndex(i);
         leftPermList.append(settings.value("Description").toString());
     }
     settings.endArray();
 
-    end = settings.beginReadArray("Left");
+    end = settings.beginReadArray("Right");
     for(int i = 0; i < end; i++) {
         settings.setArrayIndex(i);
         rightPermList.append(settings.value("Description").toString());
@@ -416,19 +416,27 @@ void finance::saveTable(const QString& tblName, const QString& totalText,
     }
 }
 
-void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
-{
-    QPoint globalPos = ui->leftTable->viewport()->mapToGlobal(pos);
+void finance::on_leftTable_customContextMenuRequested(const QPoint &pos) {
+    customContextMenuRequested(pos, ui->leftTable, &leftPermList);
+}
+
+void finance::on_rightTable_customContextMenuRequested(const QPoint &pos) {
+    customContextMenuRequested(pos, ui->rightTable, &rightPermList);
+}
+
+void finance::customContextMenuRequested(const QPoint &pos,
+                                         const QTableWidget* tbl,
+                                         QStringList* permList) {
+    QPoint globalPos = tbl->viewport()->mapToGlobal(pos);
     // Get the row where the right click happened
-    const int row = ui->leftTable->rowAt(pos.y());
+    const int row = tbl->rowAt(pos.y());
 
     if(row < 0)
         return;  // right click not on actual row
 
     // Determine if the row contains a permanently assigned item
-    const bool perm = cellMatch(ui->leftTable, row, descriptionColumn,
-                                leftPermList);
-    qDebug() << "I'm the right click menu at left table row = " << row;
+    const bool perm = cellMatch(tbl, row, descriptionColumn, *permList);
+    qDebug() << "I'm the right click menu at table row = " << row;
     // Set the context menu for this item
     tblContextMenu.setContext(perm);
 
@@ -437,14 +445,14 @@ void finance::on_leftTable_customContextMenuRequested(const QPoint &pos)
     if(selection == nullptr)
         return; // nothing selected
 
-    const QString itemDesc = ui->leftTable->item(row,descriptionColumn)->text();
+    const QString itemDesc = tbl->item(row,descriptionColumn)->text();
     if(selection->text() == "Permanent") {
         if(selection->isChecked()) {
             qDebug() << "Adding '" << itemDesc << "' to permanent list!";
-            leftPermList.append(itemDesc);
+            permList->append(itemDesc);
         } else {
             qDebug() << "Removing '" << itemDesc << "' from permanent list!";
-            leftPermList.removeAll(itemDesc);
+            permList->removeAll(itemDesc);
         }
     }
 }
