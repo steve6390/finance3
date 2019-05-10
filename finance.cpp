@@ -274,7 +274,9 @@ void finance::resetTables() {
     initMonthVec();
 
     // Populate the middle table with our vector of string lists
+    ui->leftTable->setRowCount(0);
     setRows(ui->midTable, monthRowsVec);
+    ui->rightTable->setRowCount(0);
 
     movePredeterminedRows(ui->midTable, ui->rightTable, rightPermList);
     movePredeterminedRows(ui->midTable, ui->leftTable, leftPermList);
