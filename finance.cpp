@@ -371,7 +371,7 @@ void finance::setRows(QTableWidget* tbl, const StringListVec& lv) {
             tbl->setItem(row, col, twi);
         }
         if(tbl->item(row,transactionTypeColumn)->text() == "credit") {
-            setRowBackground(tbl, row, QColor(140,240,75));
+            setRowBackground(tbl, row, QColor(211,255,198));
         }
     }
 }
