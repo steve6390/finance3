@@ -280,6 +280,9 @@ void finance::resetTables() {
 
     movePredeterminedRows(ui->midTable, ui->rightTable, rightPermList);
     movePredeterminedRows(ui->midTable, ui->leftTable, leftPermList);
+    ui->leftTable->resizeColumnsToContents();
+    ui->midTable->resizeColumnsToContents();
+    ui->rightTable->resizeColumnsToContents();
     calculateTotals();
 }
 
