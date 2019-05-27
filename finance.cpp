@@ -30,6 +30,7 @@ finance::finance(QWidget *parent) :
     readSettings();
 }
 
+// If the month change, we rebuild all tables with new data.
 void finance::dateUpdate(const QDate &date) {
     qDebug() << "Date update! " << date << endl;
     resetTables();
@@ -46,18 +47,18 @@ void finance::writeSettings() {
     QSettings settings("Personal", "Finance");
 
     settings.beginGroup("MainWindow");
-    settings.setValue("size", size());
-    settings.setValue("pos", pos());
-    settings.setValue("left_name", ui->leftNameEdit->text());
-    settings.setValue("mid_name", ui->midNameEdit->text());
-    settings.setValue("right_name", ui->rightNameEdit->text());
+    settings.setValue("Size", size());
+    settings.setValue("Pos", pos());
+    settings.setValue("LeftName", ui->leftNameEdit->text());
+    settings.setValue("MidName", ui->midNameEdit->text());
+    settings.setValue("RightName", ui->rightNameEdit->text());
     settings.endGroup();
 
 
     settings.beginWriteArray("IgnoreColumns");
     for(int i = 0, end = ignoreColumns.count(); i < end; i++) {
         settings.setArrayIndex(i);
-        settings.setValue("name",ignoreColumns.at(i));
+        settings.setValue("Name",ignoreColumns.at(i));
     }
     settings.endArray();
 
@@ -75,6 +76,9 @@ void finance::writeSettings() {
     }
     settings.endArray();
 
+    settings.beginGroup("Files");
+    settings.setValue("SaveDir", lastSaveDir);
+    settings.setValue("LoadDir", lastLoadDir);
 }
 
 void finance::readSettings()
@@ -82,17 +86,17 @@ void finance::readSettings()
     QSettings settings("Personal", "Finance");
 
     settings.beginGroup("MainWindow");
-    resize(settings.value("size", QSize(1024, 768)).toSize());
-    move(settings.value("pos", QPoint(200, 200)).toPoint());
-    ui->leftNameEdit->setText(settings.value("left_name").toString());
-    ui->midNameEdit->setText(settings.value("mid_name").toString());
-    ui->rightNameEdit->setText(settings.value("right_name").toString());
+    resize(settings.value("Size", QSize(1024, 768)).toSize());
+    move(settings.value("Pos", QPoint(200, 200)).toPoint());
+    ui->leftNameEdit->setText(settings.value("LeftName").toString());
+    ui->midNameEdit->setText(settings.value("MidName").toString());
+    ui->rightNameEdit->setText(settings.value("RightName").toString());
     settings.endGroup();
 
     int end = settings.beginReadArray("IgnoreColumns");
     for(int i = 0; i < end; i++) {
         settings.setArrayIndex(i);
-        ignoreColumns.append(settings.value("name").toString());
+        ignoreColumns.append(settings.value("Name").toString());
     }
     settings.endArray();
 
@@ -110,6 +114,9 @@ void finance::readSettings()
     }
     settings.endArray();
 
+    settings.beginGroup("Files");
+    lastSaveDir = settings.value("SaveDir").toString();
+    lastLoadDir = settings.value("LoadDir").toString();
 }
 
 void finance::moveRow(QTableWidget* fromTable, QTableWidget* toTable, int row) {
@@ -126,10 +133,12 @@ finance::~finance() {
 void finance::on_actionOpen_triggered()
 {
     qDebug() << "I'm in actionOpen_triggered!";
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
-            tr("CSV Files (*.csv) ;; All files (*.*)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
+            lastLoadDir, tr("CSV Files (*.csv) ;; All files (*.*)"));
 
     qDebug() << "Selected file name is " << fileName << endl;
+
+    lastLoadDir = getDirPart(fileName);
 
     if(fileName.isEmpty()) {
         QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
@@ -246,7 +255,7 @@ void finance::initColumns(const QStringList& hdrList) {
 }
 
 void finance::initMonthVec() {
-    // clear existing entriess from the month vec
+    // clear existing entries from the month vec
     monthRowsVec.clear();
     StringListVecItor i(fileRowsVec);
     const QDate& date = ui->dateEdit->date();
@@ -396,12 +405,17 @@ void finance::on_saveRightButton_clicked() {
     saveTable(ui->rightNameEdit->text(), ui->rightTotal->text(), ui->rightTable);
 }
 
+QString finance::getDirPart(const QString& path) {
+    QFileInfo fi(path);
+    return fi.dir().path();
+}
+
 void finance::saveTable(const QString& tblName, const QString& totalText,
                         const QTableWidget* tbl) {
     qDebug() << "I'm in saveTable!";
     // Build the default filename.
     const QDate& date = ui->dateEdit->date();
-    QString defaultName = tblName + "_";
+    QString defaultName = lastSaveDir + "/" + tblName + "_";
     defaultName += getMonthName(date) + "_";
     defaultName += QString::number(date.year()) + ".csv";
     // Replace all straggling spaces with '_'.
@@ -417,6 +431,8 @@ void finance::saveTable(const QString& tblName, const QString& totalText,
         QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
         return;
     }
+
+    lastSaveDir = getDirPart(fileName);
 }
 
 void finance::on_leftTable_customContextMenuRequested(const QPoint &pos) {

@@ -77,6 +77,11 @@ private:
     void hideIgnoredColumns(const QStringList& hdrList);
     void initColumns(const QStringList& hdrList);
 
+    /**
+     * getDirPart Returns the directory part of the path as a QString.
+     */
+    QString getDirPart(const QString& path);
+
     void initMonthVec();
 
     void writeSettings();
@@ -85,6 +90,9 @@ private:
     QStringList ignoreColumns;
     QStringList leftPermList;
     QStringList rightPermList;
+
+    QString lastLoadDir;
+    QString lastSaveDir;
 
     TableContextMenu tblContextMenu;
 
